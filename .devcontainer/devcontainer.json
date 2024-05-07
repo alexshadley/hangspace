@@ -22,5 +22,10 @@
       "onAutoForward": "openPreview"
     }
   },
-  "forwardPorts": [3000]
+  "forwardPorts": [
+    3000
+  ],
+  "features": {
+    "ghcr.io/devcontainers-contrib/features/postgres-asdf:1": {}
+  }
 }

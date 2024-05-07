@@ -3,11 +3,20 @@
   "scripts": {
     "dev": "next",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "init-db": "psql -U postgres -d dev -f db_setup.sql",
+    "psql": "psql -U postgres -d dev"
   },
   "dependencies": {
     "next": "^13.5.4",
+    "pg": "^8.11.5",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "20.12.10",
+    "@types/pg": "^8.11.6",
+    "@types/react": "18.3.1",
+    "typescript": "^5.4.5"
   }
 }
