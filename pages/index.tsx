@@ -3,7 +3,10 @@ import styles from '../styles/home.module.css'
 import { InferGetServerSidePropsType } from 'next'
 import {pgClient} from '../util/PgClient'
 
+// getServerSideProps is a magic function name, next.js looks for it and does
+// some special stuff: https://nextjs.org/docs/pages/building-your-application/data-fetching/get-server-side-props
 export const getServerSideProps = async () => {
+  // this postgres library seems dirt-simple :)
   const posts = await pgClient.query(`
     SELECT users.name, posts.content FROM posts
     JOIN users ON posts.user_id = users.id;
