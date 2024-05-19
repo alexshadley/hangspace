@@ -17,3 +17,5 @@ Some features we need to build
 - More appealing UI
 - Image posts
 - MORE???
+
+##Mom's on the scene now..
