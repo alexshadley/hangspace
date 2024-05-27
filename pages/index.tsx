@@ -138,9 +138,11 @@ const Home = ({
           <br />
           {/* conditionally show image*/}
           {m.s3Url && (
-            <img style={{ maxWidth: "100%" }} src={m.s3Url} alt="m.s3Url" />
+            <>
+              <img style={{ maxWidth: "100%" }} src={m.s3Url} alt="m.s3Url" />
+              <br />
+            </>
           )}
-          <br />
           {m.created_ts}
         </div>
       ))}
