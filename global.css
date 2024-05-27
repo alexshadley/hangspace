@@ -12,3 +12,14 @@ body {
   text-rendering: optimizeLegibility;
   hyphens: auto;
 }
+
+.reframe {
+  height: 300px;
+  width: 600px;
+  overflow: hidden;
+}
+
+.reframe img {
+  height: auto;
+  width: 600px;
+}

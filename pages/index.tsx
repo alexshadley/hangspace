@@ -92,9 +92,14 @@ const Home = ({
       {messages.map((m) => (
         <div className={styles.card} >
           <b>{m.userName}:</b> {m.content} {m.created_ts}
-          {/* <img src='https://'/> */}
-          <br/>{m.s3Url}  <img src={m.s3Url}/> 
-        </div>
+          
+          {/* conditionally show image*/}          
+          {m.s3Url && (
+            <div className="reframe">
+              <img src={m.s3Url} alt="m.s3Url"/>
+            </div>)
+          }
+          </div>       
       ))}
 
     <button onClick={() => {
