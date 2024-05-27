@@ -52,23 +52,23 @@ export default async function handler(
     });
 
     const s3 = new AWS.S3();
-    s3.putObject(params, async (err, data) => {
+    await s3.putObject(params, async (err, data) => {
       if (err) {
         console.error(err);
         return res.status(500).send({ error: "Error uploading file" });
       }
+    });
 
-      const url = `https://${params.Bucket}.s3.${AWS.config.region}.amazonaws.com/${params.Key}`;
-      console.log("uploaded!!!", url);
+    const url = `https://${params.Bucket}.s3.${AWS.config.region}.amazonaws.com/${params.Key}`;
+    console.log("uploaded!!!", url);
 
-      var result = await pgClient.query(
-        `
+    var result = await pgClient.query(
+      `
           insert into images (post_id, s3_url) values 
             ($1, $2);   
       `,
-        [postId, url]
-      );
-    });
+      [postId, url]
+    );
   }
 
   res.status(200).json({});
