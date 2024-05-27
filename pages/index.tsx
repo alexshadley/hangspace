@@ -29,7 +29,9 @@ const Home = ({
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const [messages, setMessages] = useState(initialMessages);
 
-  const [userId, setUserId] = useState<number | null>(null);
+  const [userId, setUserId] = useState<number | null>(
+     null
+  );
   const [message, setMessage] = useState<string>("");
 
   const [showCount, setShowCount] = useState<number>(5);
@@ -45,13 +47,23 @@ const Home = ({
     return () => clearInterval(id);
   }, []);
 
+  useEffect(() => {
+    const userIdFromStorage = window.localStorage.getItem("logged-in-user-id") ? parseInt(localStorage.getItem("logged-in-user-id")) : null;
+    if (userIdFromStorage) {
+      setUserId(userIdFromStorage);
+    }
+  }, [])
+
   async function handleSubmit() {
     const formData = new FormData();
-    formData.append('userId', userId.toString());
-    formData.append('message', message);
+    formData.append("userId", userId.toString());
+    formData.append("message", message);
 
-    const fileInput = document.getElementById('image-selector');
-    formData.append('file', fileInput.files.length > 0 ? fileInput.files[0] : null)
+    const fileInput = document.getElementById("image-selector");
+    formData.append(
+      "file",
+      fileInput.files.length > 0 ? fileInput.files[0] : null
+    );
 
     await fetch(`/api/newPost`, { method: "POST", body: formData });
     setMessage("");
@@ -59,53 +71,83 @@ const Home = ({
   }
 
   async function handleRefresh(newShowCount) {
-    var data = await fetch(`/api/refresh?showCount=${newShowCount}`, { method: "GET" });
+    var data = await fetch(`/api/refresh?showCount=${newShowCount}`, {
+      method: "GET",
+    });
 
     var msg = await data.json();
     setMessages(msg.messages);
-
   }
 
-  function handleAttach() {
-
-  }
-
-  //console.log([1, 2].map(v => v + 1))
+  function handleAttach() {}
 
   if (!userId) {
-    return <SelectUser onSetUserId={(newVal) => setUserId(newVal)} />;
+    return (
+      <div>
+        Who are you?
+        <br />
+        {users.map((u) => (
+          <>
+            <button
+              onClick={() => {
+                window.localStorage.setItem("logged-in-user-id", u.id);
+                setUserId(u.id);
+              }}
+            >
+              {u.name}
+            </button>
+            <br />
+          </>
+        ))}
+      </div>
+    );
   }
 
   return (
     <main className={styles.main}>
       <h1>Hangspace!</h1>
-      <h2>
-        welcome user {userId} {username}
-      </h2>
+      <div style={{display: 'flex', alignItems: 'center', gap: '12px'}}>
+        <h2>
+          Welcome user: {userId} {username}
+        </h2>
+        <button onClick={() => {
+          window.localStorage.setItem("logged-in-user-id", null)
+          setUserId(null);
+        }}>Logout</button>
+      </div>
       <input
         value={message}
         onChange={(event) => setMessage(event.target.value)}
-      ></input>
+      ></input>      
+
       {/* <button onClick={handleAttach}>Attach image</button> */}
       <button onClick={handleSubmit}>Send!</button>
-      <input type="file" id="image-selector"/>
+      <input type="file" id="image-selector" />
+      
+      <hr/>
+      <br/>
       {messages.map((m) => (
-        <div className={styles.card} >
-          <b>{m.userName}:</b> {m.content} {m.created_ts}
-          
-          {/* conditionally show image*/}          
+        <div className={styles.card}>
+          <b>{m.userName}:</b> {m.content} 
+          {/* conditionally show image*/}
           {m.s3Url && (
             <div className="reframe">
-              <img src={m.s3Url} alt="m.s3Url"/>
-            </div>)
-          }
-          </div>       
+              <img src={m.s3Url} alt="m.s3Url" />
+            </div>
+          )}
+          <br/>
+          {m.created_ts}
+        </div>
       ))}
 
-    <button onClick={() => {
-      setShowCount(showCount + 5);
-      handleRefresh(showCount + 5);
-    }}>Show me more...</button>
+      <button
+        onClick={() => {
+          setShowCount(showCount + 5);
+          handleRefresh(showCount + 5);
+        }}
+      >
+        Show me more...
+      </button>
     </main>
   );
 };
