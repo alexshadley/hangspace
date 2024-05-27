@@ -3,7 +3,7 @@ import { pgClient } from "../../util/PgClient";
 import formidable from "formidable";
 import fs from "fs";
 import AWS from "aws-sdk";
-import {v4} from 'uuid';
+import { v4 } from "uuid";
 
 export const config = {
   api: {
@@ -21,12 +21,14 @@ export default async function handler(
   const [data, files] = await form.parse(req);
   console.log("finish parse");
 
-
-  var result = await pgClient.query(`
+  var result = await pgClient.query(
+    `
     insert into posts (content, user_id) values 
-    ('${data.message}', ${data.userId})
+    ($1, $2)
     returning id;   
-  `);
+  `,
+    [data.message[0], data.userId[0]]
+  );
   const postId = result.rows[0].id;
 
   if (files?.file) {
@@ -39,7 +41,7 @@ export default async function handler(
       Bucket: "hangspaces",
       Key: fileKey,
       Body: fileStream,
-      ContentType: files.file[0].mimetype // Set content type
+      ContentType: files.file[0].mimetype, // Set content type
     };
 
     //Configure AWS SDK
@@ -50,20 +52,22 @@ export default async function handler(
     });
 
     const s3 = new AWS.S3();
-    s3.putObject(params, async (err, data) =>  {
+    s3.putObject(params, async (err, data) => {
       if (err) {
         console.error(err);
         return res.status(500).send({ error: "Error uploading file" });
       }
 
       const url = `https://${params.Bucket}.s3.${AWS.config.region}.amazonaws.com/${params.Key}`;
-      console.log('uploaded!!!', url);
+      console.log("uploaded!!!", url);
 
-      var result = await pgClient.query(`
+      var result = await pgClient.query(
+        `
           insert into images (post_id, s3_url) values 
             ($1, $2);   
-      `, [postId, url]) ;
-
+      `,
+        [postId, url]
+      );
     });
   }
 
