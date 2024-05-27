@@ -135,11 +135,10 @@ const Home = ({
       {messages.map((m) => (
         <div className={styles.card}>
           <b>{m.userName}:</b> {m.content}
+          <br />
           {/* conditionally show image*/}
           {m.s3Url && (
-            <div className="reframe">
-              <img src={m.s3Url} alt="m.s3Url" />
-            </div>
+            <img style={{ maxWidth: "100%" }} src={m.s3Url} alt="m.s3Url" />
           )}
           <br />
           {m.created_ts}
