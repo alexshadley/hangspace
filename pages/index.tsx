@@ -121,20 +121,25 @@ const Home = ({
           Logout
         </button>
       </div>
-      <input
+      <textarea
+        style={{ width: "400px", height: "120px" }}
         value={message}
         onChange={(event) => setMessage(event.target.value)}
-      ></input>
+      />
+      <br />
 
-      {/* <button onClick={handleAttach}>Attach image</button> */}
-      <button onClick={handleSubmit}>Send!</button>
+      <button onClick={handleSubmit} style={{ marginRight: "8px" }}>
+        Send!
+      </button>
       <input type="file" id="image-selector" />
 
       <hr />
       <br />
       {messages.map((m) => (
         <div className={styles.card}>
-          <b>{m.userName}:</b> {m.content}
+          <div style={{ whiteSpace: "pre-line" }}>
+            <b>{m.userName}:</b> {m.content}
+          </div>
           <br />
           {/* conditionally show image*/}
           {m.s3Url && (
@@ -143,7 +148,7 @@ const Home = ({
               <br />
             </>
           )}
-          {m.created_ts}
+          <div style={{ fontStyle: "italic" }}>{m.created_ts}</div>
         </div>
       ))}
 
