@@ -32,31 +32,41 @@ const Home = ({
   const [userId, setUserId] = useState<number | null>(null);
   const [message, setMessage] = useState<string>("");
 
+  const [showCount, setShowCount] = useState<number>(5);
+
   const currentUser = users.find((user) => user.id === userId);
   const username = currentUser?.name;
 
   useEffect(() => {
     // runs this function every 1s
-    const id = setInterval(() => handleRefresh(), 1000);
+    const id = setInterval(() => handleRefresh(showCount), 1000);
 
     // not important
     return () => clearInterval(id);
   }, []);
 
   async function handleSubmit() {
-    // const myDict = {a: 1, b: "hello!"}
-    // JSON.stringify({a: 1})
-    const formData = JSON.stringify({ userId: userId, message: message });
+    const formData = new FormData();
+    formData.append('userId', userId.toString());
+    formData.append('message', message);
+
+    const fileInput = document.getElementById('image-selector');
+    formData.append('file', fileInput.files.length > 0 ? fileInput.files[0] : null)
+
     await fetch(`/api/newPost`, { method: "POST", body: formData });
     setMessage("");
-    handleRefresh();
+    handleRefresh(showCount);
   }
 
-  async function handleRefresh() {
-    var data = await fetch(`/api/refresh`, { method: "GET" });
+  async function handleRefresh(newShowCount) {
+    var data = await fetch(`/api/refresh?showCount=${newShowCount}`, { method: "GET" });
 
     var msg = await data.json();
     setMessages(msg.messages);
+
+  }
+
+  function handleAttach() {
 
   }
 
@@ -72,17 +82,25 @@ const Home = ({
       <h2>
         welcome user {userId} {username}
       </h2>
-      {messages.map((m) => (
-        <div>
-          <b>{m.userName}:</b> {m.content} {m.created_ts}
-        </div>
-      ))}
-      {/* onChange="funtion()";    */}
       <input
         value={message}
         onChange={(event) => setMessage(event.target.value)}
       ></input>
-      <button onClick={handleSubmit}> Send!</button>
+      {/* <button onClick={handleAttach}>Attach image</button> */}
+      <button onClick={handleSubmit}>Send!</button>
+      <input type="file" id="image-selector"/>
+      {messages.map((m) => (
+        <div className={styles.card} >
+          <b>{m.userName}:</b> {m.content} {m.created_ts}
+          {/* <img src='https://'/> */}
+          <br/>{m.s3Url}  <img src={m.s3Url}/> 
+        </div>
+      ))}
+
+    <button onClick={() => {
+      setShowCount(showCount + 5);
+      handleRefresh(showCount + 5);
+    }}>Show me more...</button>
     </main>
   );
 };

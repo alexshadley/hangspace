@@ -6,7 +6,7 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const posts = await queryPosts();
+  const posts = await queryPosts(req.query['showCount'] as string);
 
   res.status(200).json({
     messages: posts,

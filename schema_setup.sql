@@ -16,6 +16,13 @@ CREATE TABLE posts (
     parent_id integer REFERENCES posts(id)
 );
 
+CREATE TABLE images (
+    id serial PRIMARY KEY,
+    created_ts timestamp DEFAULT CURRENT_TIMESTAMP, 
+    post_id integer REFERENCES posts(id),
+    s3_url text
+);
+
 insert into users (name) values
     ('Alex'),
     ('Daisy'),
