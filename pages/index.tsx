@@ -29,9 +29,7 @@ const Home = ({
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const [messages, setMessages] = useState(initialMessages);
 
-  const [userId, setUserId] = useState<number | null>(
-     null
-  );
+  const [userId, setUserId] = useState<number | null>(null);
   const [message, setMessage] = useState<string>("");
 
   const [showCount, setShowCount] = useState<number>(5);
@@ -48,18 +46,22 @@ const Home = ({
   }, []);
 
   useEffect(() => {
-    const userIdFromStorage = window.localStorage.getItem("logged-in-user-id") ? parseInt(localStorage.getItem("logged-in-user-id")) : null;
+    const userIdFromStorage = window.localStorage.getItem("logged-in-user-id")
+      ? parseInt(localStorage.getItem("logged-in-user-id"))
+      : null;
     if (userIdFromStorage) {
       setUserId(userIdFromStorage);
     }
-  }, [])
+  }, []);
 
   async function handleSubmit() {
     const formData = new FormData();
     formData.append("userId", userId.toString());
     formData.append("message", message);
 
-    const fileInput = document.getElementById("image-selector");
+    const fileInput = document.getElementById(
+      "image-selector"
+    ) as HTMLInputElement;
     formData.append(
       "file",
       fileInput.files.length > 0 ? fileInput.files[0] : null
@@ -106,36 +108,40 @@ const Home = ({
   return (
     <main className={styles.main}>
       <h1>Hangspace!</h1>
-      <div style={{display: 'flex', alignItems: 'center', gap: '12px'}}>
+      <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
         <h2>
           Welcome user: {userId} {username}
         </h2>
-        <button onClick={() => {
-          window.localStorage.setItem("logged-in-user-id", null)
-          setUserId(null);
-        }}>Logout</button>
+        <button
+          onClick={() => {
+            window.localStorage.setItem("logged-in-user-id", null);
+            setUserId(null);
+          }}
+        >
+          Logout
+        </button>
       </div>
       <input
         value={message}
         onChange={(event) => setMessage(event.target.value)}
-      ></input>      
+      ></input>
 
       {/* <button onClick={handleAttach}>Attach image</button> */}
       <button onClick={handleSubmit}>Send!</button>
       <input type="file" id="image-selector" />
-      
-      <hr/>
-      <br/>
+
+      <hr />
+      <br />
       {messages.map((m) => (
         <div className={styles.card}>
-          <b>{m.userName}:</b> {m.content} 
+          <b>{m.userName}:</b> {m.content}
           {/* conditionally show image*/}
           {m.s3Url && (
             <div className="reframe">
               <img src={m.s3Url} alt="m.s3Url" />
             </div>
           )}
-          <br/>
+          <br />
           {m.created_ts}
         </div>
       ))}
