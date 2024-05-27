@@ -122,7 +122,7 @@ const Home = ({
         </button>
       </div>
       <textarea
-        style={{ width: "400px", height: "120px" }}
+        style={{ maxWidth: "100%", width: "400px", height: "120px" }}
         value={message}
         onChange={(event) => setMessage(event.target.value)}
       />
