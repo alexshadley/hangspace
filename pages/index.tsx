@@ -39,7 +39,7 @@ const Home = ({
 
   useEffect(() => {
     // runs this function every 1s
-    const id = setInterval(() => handleRefresh(showCount), 1000);
+    const id = setInterval(() => handleRefresh(showCount), 10000);
 
     // not important
     return () => clearInterval(id);
