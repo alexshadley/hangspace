@@ -3,6 +3,8 @@ import { pgClient } from "../../util/PgClient";
 import formidable from "formidable";
 import fs from "fs";
 import AWS from "aws-sdk";
+import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import { fromEnv } from "@aws-sdk/credential-providers";
 import { v4 } from "uuid";
 
 export const config = {
@@ -44,22 +46,16 @@ export default async function handler(
       ContentType: files.file[0].mimetype, // Set content type
     };
 
-    //Configure AWS SDK
-    AWS.config.update({
-      accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+    const s3 = new S3Client({
+      credentials: fromEnv(),
       region: process.env.AWS_REGION,
     });
 
-    const s3 = new AWS.S3();
-    await s3.putObject(params, async (err, data) => {
-      if (err) {
-        console.error(err);
-        return res.status(500).send({ error: "Error uploading file" });
-      }
-    });
+    console.log("start upload");
+    await s3.send(new PutObjectCommand(params));
+    console.log("finish upload");
 
-    const url = `https://${params.Bucket}.s3.${AWS.config.region}.amazonaws.com/${params.Key}`;
+    const url = `https://${params.Bucket}.s3.${process.env.AWS_REGION}.amazonaws.com/${params.Key}`;
     console.log("uploaded!!!", url);
 
     var result = await pgClient.query(
@@ -71,5 +67,6 @@ export default async function handler(
     );
   }
 
-  res.status(200).json({});
+  console.log("status 200");
+  res.status(200).json({ ok: true });
 }
