@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import styles from "../styles/home.module.css";
 import { InferGetServerSidePropsType } from "next";
 import { SelectUser } from "../components/SelectUser";
@@ -32,14 +32,23 @@ const Home = ({
   const [userId, setUserId] = useState<number | null>(null);
   const [message, setMessage] = useState<string>("");
 
-  const [showCount, setShowCount] = useState<number>(5);
+  const showCount = useRef(5);
 
   const currentUser = users.find((user) => user.id === userId);
   const username = currentUser?.name;
 
   useEffect(() => {
-    // runs this function every 1s
-    const id = setInterval(() => handleRefresh(showCount), 10000);
+    window.addEventListener("paste", (e) => {
+      const fileInput = document.getElementById(
+        "image-selector"
+      ) as HTMLInputElement;
+      fileInput.files = e.clipboardData.files;
+    });
+  }, []);
+
+  useEffect(() => {
+    // runs this function every 10s
+    const id = setInterval(() => handleRefresh(), 10000);
 
     // not important
     return () => clearInterval(id);
@@ -69,19 +78,17 @@ const Home = ({
 
     await fetch(`/api/newPost`, { method: "POST", body: formData });
     setMessage("");
-    handleRefresh(showCount);
+    handleRefresh();
   }
 
-  async function handleRefresh(newShowCount) {
-    var data = await fetch(`/api/refresh?showCount=${newShowCount}`, {
+  async function handleRefresh() {
+    var data = await fetch(`/api/refresh?showCount=${showCount.current}`, {
       method: "GET",
     });
 
     var msg = await data.json();
     setMessages(msg.messages);
   }
-
-  function handleAttach() {}
 
   if (!userId) {
     return (
@@ -148,14 +155,22 @@ const Home = ({
               <br />
             </>
           )}
-          <div style={{ fontStyle: "italic" }}>{m.created_ts}</div>
+          <div style={{ fontStyle: "italic" }}>
+            {/* convert m.created_ts to format like May 5, 12:15 */}
+            {new Date(m.created_ts).toLocaleDateString("en-US", {
+              month: "long",
+              day: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+            })}
+          </div>
         </div>
       ))}
 
       <button
         onClick={() => {
-          setShowCount(showCount + 5);
-          handleRefresh(showCount + 5);
+          showCount.current = showCount.current + 5;
+          handleRefresh();
         }}
       >
         Show me more...
